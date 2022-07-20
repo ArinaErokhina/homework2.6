@@ -20,13 +20,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     ));
     private static int maxEmployeeCount = 11;
 
-    public Set<Employee> uniqueEmployee(Map<String, Employee> employees ){
-        Set<Employee>uniqEmpl = new HashSet<>();
-        for (Employee i : employees.values()) {
-            uniqEmpl.add(i);
-        }
-        return uniqEmpl;
-    }
     public Employee addEmployee(Employee employee) {
         if (employee.getNameEmployee() == null || employee.getSurnameEmployee() == null) {
             throw new EmployeeDataEnteredIncorrectlyException();
@@ -34,10 +27,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (maxEmployeeCount == employees.size()) {
             throw new EmployeeStorageIsFullException();
         }
-        for (int i = 0; i < employees.size(); i++) {
-            if (employee.equals(employees.get(i))) {
+        if (employees.containsKey(employee.getNameEmployee())) {
                 throw new EmployeeAlreadyAddedException();
-            }
         }
         employees.put(employee.getNameEmployee(), employee);
         return employee;
@@ -47,11 +38,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee.getNameEmployee() == null || employee.getSurnameEmployee() == null) {
             throw new EmployeeDataEnteredIncorrectlyException();
         }
-        for (int i = 0; i < employees.size(); i++) {
-            if (employee.equals(employees.get(i)))
-                return employees.remove(i);
-        }
-        throw new EmployeeNotFoundException();
+        if (employees.containsKey(employee.getNameEmployee()))
+                return employees.remove(employee.getNameEmployee());
+
+    throw new EmployeeNotFoundException();
     }
 
     public Employee findEmployee(String nameEmployee) {
@@ -59,15 +49,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee.getNameEmployee() == null || employee.getSurnameEmployee() == null) {
             throw new EmployeeDataEnteredIncorrectlyException();
         }
-        if (employee.equals(employees.get(nameEmployee))) {
-            return employees.get(nameEmployee);
+        if (employees.containsKey(employee.getNameEmployee())) {
+            return employees.get(employee.getNameEmployee());
         }
 
         throw new EmployeeNotFoundException();
     }
 
-    public Map<String, Employee> allEmployee() {
-        return employees;
+    public Collection<Employee> allEmployee() {
+        return Collections.unmodifiableCollection(employees.values());
     }
 
 
